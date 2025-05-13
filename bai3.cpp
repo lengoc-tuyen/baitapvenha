@@ -25,15 +25,17 @@ private:
     int size;
     vector<vector<T>> table;
     int hash(int key) {
-        if (table[hash1(key)].empty()) {
+        if (size == maxSize) return -1;
+        if (table[hash1(key)].empty() || table[hash1(key)][0].getFromID() == key) {
             return hash1(key);
         }
         int i = 0;
-        while (true) {
+        while (i < maxSize) {
             if (table[(hash1(key) + i * hash2(key)) % maxSize].empty())
                 return (hash1(key) + i * hash2(key)) % maxSize;
             i++;
         }
+        return -1;
     }
 
     int hash1(int key) {
@@ -51,9 +53,12 @@ public:
         if (size == maxSize) return false;
 
         int idx = hash(user);
-        table[idx].push_back(value);
-        size++;
-        return true;
+        if (idx != -1) {
+            table[idx].push_back(value);
+            return true;
+        } 
+        return false;
+
     }
 
     int getSize() {
@@ -62,7 +67,9 @@ public:
 
     vector<T> operator[](int user) {
         int idx = hash(user);
-        return table[idx];
+        if (idx != -1)
+            return table[idx];
+        return {};
     }
 
     void getAllTransactions(vector<vector<T>>& result) {
@@ -133,7 +140,7 @@ public:
         string time = trans.getTime();
 
         // check 5 giao dich 
-        if (transList.size() >= 4)  {
+        if (transList.size() >= 5)  {
             string t = transList[transList.size() - 4].getTime();
             if (isOneMinute(time, t)) {
                 return true;
@@ -141,7 +148,7 @@ public:
         }
 
         //check 3 lan cung 1 tai khoan trong 1p
-        int count  = 0;
+        int count  = 1;
         for (int i = transList.size() - 1; i >= 0; i--) {
             string t = transList[i].getTime();
             if (!isOneMinute(time, t)) 
@@ -181,28 +188,45 @@ public:
 };
 
 int main() {
+    string input;
     int n;
+    bool isValid = true;
     DetectFraudSystem *System = new DetectFraudSystem;
     do {
-        cout << "==============================MENU==============================\n";
-        cout << "1. Them giao dich.\n";
-        cout << "2. Hien cac giao dich trong he thong.\n";
-        cout << "3. Thoat.\n";
-        cout << "Nhap vao 1 gia tri tu 1 den 3.\n";
-        cin >> n;
+        do {
+            cout << "==============================MENU==============================\n";
+            cout << "1. Them giao dich.\n";
+            cout << "2. Hien cac giao dich trong he thong.\n";
+            cout << "3. Thoat.\n";
+            cout << "Nhap vao 1 gia tri tu 1 den 3.\n";
+            cin >> input;
+
+            isValid = true;
+        
+            for (char c : input) {
+                if (!isdigit(c)) {
+                    isValid = false;
+                    break;
+                }
+            }
+        } while (!isValid || input.length() != 1 || (input[0] < '1' || input[0] > '3'));
+        n = stoi(input);
         switch (n) {
             case 1: {
                 system("clear");
                 int fromID, toID;
                 double money;
                 string time;
-                cout << "Nhap ID nguoi gui: ";
+                cout << "Nhap ID nguoi gui (so nguyen): ";
                 cin >> fromID;
-                cout << "Nhap ID nguoi nhan: ";
+
+                cout << "Nhap ID nguoi nhan (so nguyen): ";
                 cin >> toID;
-                cout << "Nhap so tien can gui: ";
+
+                cout << "Nhap so tien can gui (1 so): ";
                 cin >> money;
-                cout << "Nhap thoi gian thuc hien giao dich (hh:mm:ss): ";
+
+                cout << "Nhap thoi gian thuc hien giao dich (co dang hh:mm:ss , giao dich phai co moc thoi gian tre hon cac giao dich truoc): ";
                 cin.ignore();
                 getline(cin, time);
                 cout << "\n\n\n";
@@ -219,10 +243,15 @@ int main() {
                 System->showTransaction();
                 break;
             }
-            default: {}
+            case 3: {
+                system("clear");
+                cout << "Cam on da su dung, tam biet." << endl;
+                return 0;
+            }
+            default: { continue; }
         }
 
-    } while (n != 3);
+    } while (true);
     delete System;
     return 0;
 }
