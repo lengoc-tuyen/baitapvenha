@@ -14,11 +14,12 @@ private:
             return hash1(key);
         }
         int i = 0;
-        while (true) {
+        while (i < maxSize) {
             if (!table[(hash1(key) + i * hash2(key)) % maxSize].has_value())
                 return (hash1(key) + i * hash2(key)) % maxSize;
             i++;
         }
+        return -1;
     }
 
     int hash1(int key) {
@@ -43,40 +44,26 @@ public:
         }
         
         int idx = hash(value);
-        cout << idx;
         table[idx] = value;
         size++;
         return true;
     }
 
     bool find(int x) {
-        int idx = hash(x);
-        
-        if (table[idx] == x) return true;
-        int i = 0;
-        while (i < maxSize - idx){
-            if (table[idx + i] == x)
+        for (int i = 0; i < maxSize; i++) {
+            if (table[i] == x)
                 return true;
-            i++;
         }
         return false;
     }
 
     bool erase(int val) {
-        if (!find(val))
-            return false;
-        int idx = hash(val);
-        if (table[idx] == val) {
-            table[idx] = nullopt;
-            return true;
-        }
-        int i = 0;
-        while (i < maxSize - idx){
-            if (table[idx + i] == val) {
-                table[idx + i] = nullopt;
+        for (int i = 0; i < maxSize; i++) {
+            if (table[i] == val) {
+                table[i] = nullopt;
+                size--;
                 return true;
             }
-            i++;
         }
         return false;
     }
