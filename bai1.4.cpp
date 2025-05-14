@@ -5,8 +5,8 @@ using namespace std;
 
 class HashTable {
 private:
-    const int maxSize = 1e6 + 3;
-    const int prime = 999983;
+    const int maxSize = 2017;
+    const int prime = 1117;
     int size;
     vector<optional<int>> table;
     int hash(int key) {
@@ -22,12 +22,26 @@ private:
         return -1;
     }
 
+    int findPosition(int key) {
+        int index = hash1(key);
+        if (table[index].has_value() && table[index] == key)
+            return index;
+        int i = 0;
+        while (i < maxSize) {
+            if (table[(hash1(key) + i * hash2(key)) % maxSize].has_value() && table[(hash1(key) + i * hash2(key)) % maxSize] == key)
+                return (hash1(key) + i * hash2(key)) % maxSize;
+            i++;
+        }
+        return -1;
+    }
+
     int hash1(int key) {
         return (key + maxSize) % maxSize;
     }
 
     int hash2(int key) {
-        return prime - (key % prime);
+        int value = (prime - (key % prime)) % maxSize;
+        return (value == 0) ? 1 : value;  
     }
 
 public:
@@ -44,26 +58,24 @@ public:
         }
         
         int idx = hash(value);
+        if (idx == -1)
+            return false;
         table[idx] = value;
         size++;
         return true;
     }
 
     bool find(int x) {
-        for (int i = 0; i < maxSize; i++) {
-            if (table[i] == x)
-                return true;
-        }
-        return false;
+        int idx = findPosition(x);
+        return idx != -1;
     }
 
     bool erase(int val) {
-        for (int i = 0; i < maxSize; i++) {
-            if (table[i] == val) {
-                table[i] = nullopt;
-                size--;
-                return true;
-            }
+        int idx = findPosition(val);
+        if (idx != -1) {
+            table[idx] = nullopt;
+            size--;
+            return true;
         }
         return false;
     }
@@ -143,5 +155,3 @@ int main() {
     } while (choose != 5);
 
 }
-
- 

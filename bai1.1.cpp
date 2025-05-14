@@ -10,31 +10,40 @@ private:
         Node* next;
         Node(int x) : val(x), next(nullptr) {}
     };
+    int maxSize;
     int size;
     Node** table;
 public:
     HashTable() {
-        size = 1e6 + 3;
-        table = new Node*[size];
+        maxSize = 2017;
+        table = new Node*[maxSize];
+        size = 0;
+
     }
 
-    void insert(int x) {
-        if (!table[abs(x) % size])
-            table[abs(x) % size] = new Node(x);
+    bool insert(int x) {
+        if (find(x) || size >= maxSize) {
+            return false;
+        }
+        if (!table[abs(x) % maxSize]) {
+            table[abs(x) % maxSize] = new Node(x);
+            size++;
+        }
         else {
-            Node* ptr = table[abs(x) % size];
+            Node* ptr = table[abs(x) % maxSize];
             while (ptr->next) {
                 ptr = ptr->next;
             }
             ptr->next = new Node(x);
         }
+        return true;
     }
 
 
     bool find(int x) {
-        if (!table[abs(x) % size])
+        if (!table[abs(x) % maxSize])
             return false;
-        Node* ptr = table[abs(x) % size];
+        Node* ptr = table[abs(x) % maxSize];
         while (ptr) {
             if (ptr->val == x)
                 return true;
@@ -46,18 +55,21 @@ public:
     bool erase(int x) {
         if (!find(x))
             return false;
-        Node* ptr = table[abs(x) % size];
+        Node* ptr = table[abs(x) % maxSize];
         if (ptr->val == x) {
-            table[abs(x) % size] = ptr->next;
-            delete ptr;
-            return true;
+            table[abs(x) % maxSize] = ptr->next;
+            if (!ptr->next) { 
+                size--;
+                delete ptr;
+                return true;
+            }
         }
-
         while (ptr) {
             if (ptr->next && ptr->next->val == x) {
                 Node* temp = ptr->next;
                 ptr->next = temp->next;
                 delete temp;
+                return true;
             }
             else 
                 ptr = ptr->next;
@@ -65,10 +77,9 @@ public:
         return true;
     }
 
-
     int countElement() {
         int ans = 0;
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < maxSize; i++) {
             Node* ptr = table[i];
             while (ptr) {
                 ans++;
@@ -80,7 +91,7 @@ public:
 
 
     double loadFactor() {
-        return (double) countElement() / size;
+        return (double) countElement() / maxSize;
     }
 };
 
@@ -103,8 +114,10 @@ int main() {
                 int x;
                 cout << "Nhap phan tu can them: ";
                 cin >> x;
-                table.insert(x);
-                cout << "Da them thanh cong.\n";
+                if (table.insert(x))
+                    cout << "Da them thanh cong.\n";
+                else
+                    cout << "Khong the them phan tu.\n";
                 break;
             }
 

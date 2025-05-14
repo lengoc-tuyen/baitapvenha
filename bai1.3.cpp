@@ -6,64 +6,76 @@ using namespace std;
 
 class HashTable {
 private:
-    const int size = 1e6 + 3;
+    const int maxSize = 2017;
     vector<optional<int>> table;
+    int size;
 public:
-    HashTable() : table(size) {}
+    HashTable() : table(maxSize), size (0) {}
 
-    void insert(int x) {
-        if (!table[abs(x) % size].has_value())
-            table[abs(x) % size] = x;
+    bool insert(int x) {
+        if (find(x)) {
+            return false;
+        }
+        if (!table[abs(x) % maxSize].has_value()) {
+            table[abs(x) % maxSize] = x;
+            size++;
+            return true;
+        }
         else {
-            int i = 0;
-            int temp = (abs(x) % size + i * i) % size;
-            while (i < size && table[temp].has_value()) {
+            int i = 1;
+            int temp = (abs(x) % maxSize + i * i) % maxSize;
+            while (i < maxSize && table[temp].has_value()) {
                 i++;
-                temp = (abs(x) % size + i * i ) % size;
+                temp = (abs(x) % maxSize + i * i ) % maxSize;
             }
 
-            if (i < size) 
+            if (i < maxSize) {
                 table[temp] = x;
+                size++;
+                return true;
+            }
             else {
                 cout << "Bang da day.\n";
+                return false;
             }
         }
     }
 
+
+    int findPosition(int key) {
+        int index = abs(key) % maxSize;
+
+        if (table[index].has_value() && table[index] == key)
+            return index;
+        int i = 1;
+        while (i < maxSize) {
+            int pos = (index + i * i) % maxSize;
+            if (table[pos].has_value() && table[pos] == key)
+                return pos;
+            i++;
+        }
+        return -1;
+    }
 
     bool find(int x) {
-        for (int i = 0; i < size; i++) {
-            if (table[i] == x)
-                return true;
+        int idx = findPosition(x);
+        return idx != -1;
+    }
+
+    bool erase(int val) {
+        int idx = findPosition(val);
+        if (idx != -1) {
+            table[idx] = nullopt;
+            size--;
+            return true;
         }
         return false;
     }
 
-    bool erase(int x) {
-        if (!find(x))
-            return false;
-        for (int i = 0; i < size; i++) {
-            if (table[i] == x) {
-                table[i] = nullopt;
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    int countElement() {
-        int ans = 0;
-        for (int i = 0; i < size; i++) {
-            if (table[i].has_value())
-                ans++;
-        }
-        return ans;
-    }
 
 
     double loadFactor() {
-        return (double) countElement() / size;
+        return (double) size / maxSize;
     }
 };
 
@@ -86,8 +98,10 @@ int main() {
                 int x;
                 cout << "Nhap phan tu can them: ";
                 cin >> x;
-                table.insert(x);
-                cout << "Da them thanh cong.\n";
+                if (table.insert(x))
+                    cout << "Da them thanh cong.\n";
+                else
+                    cout << "Khong the them.\n";
                 break;
             }
 

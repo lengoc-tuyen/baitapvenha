@@ -1,0 +1,70 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug C++ file",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/a.out", 
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "lldb", // nếu dùng macOS; dùng "gdb" nếu là Ubuntu/Windows với MinGW
+        "preLaunchTask": "build",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ]
+      },
+      {
+        "name": "Debug bai1.4",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/bai1.4",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "lldb",
+        "preLaunchTask": "build-bai1.4"
+      },
+      {
+        "name": "Debug bai1.4 with GDB",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/bai1.4",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+          }
+        ],
+        "preLaunchTask": "build-bai1.4"
+      },
+      {
+        "name": "Debug bao",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/main",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "Build HCMCampaign",
+        "internalConsoleOptions": "openOnSessionStart",
+        "stopAtEntry": false,
+        "MIMode": "lldb"
+      }
+    ]
+  }

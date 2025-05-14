@@ -31,8 +31,9 @@ private:
         }
         int i = 0;
         while (i < maxSize) {
-            if (table[(hash1(key) + i * hash2(key)) % maxSize].empty())
-                return (hash1(key) + i * hash2(key)) % maxSize;
+            int temp = (hash1(key) + i * hash2(key)) % maxSize;
+            if (table[temp].empty() || table[temp][0].getFromID() == key)
+                return temp;
             i++;
         }
         return -1;
@@ -49,11 +50,13 @@ private:
 public:
     HashTable() : table(maxSize), size(0) {}
 
+// them giao dich moi cua user (neu user chua co thi luu user vo ht)
     bool insert(int user, T value) {
         if (size == maxSize) return false;
 
         int idx = hash(user);
         if (idx != -1) {
+            if ()
             table[idx].push_back(value);
             return true;
         } 
